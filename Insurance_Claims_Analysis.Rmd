@@ -8,4 +8,162 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+### Loading in Libraries
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+```
+### Reading in Dataset
+
+```{r}
+df_insurance <- read_csv("Insurance_factor_identification.csv")
+```
+
+```{r}
+str(df_insurance)
+```
+
+
+```{r}
+summary(df_insurance)
+```
+
+## Data Preprocessing
+
+Checking for Missing Values:
+```{r}
+sum(is.na(df_insurance)) # no missing values
+```
+Checking ranges of each column to make sure values make sense:
+
+ Kilometers- Values should be between 1 and 5, 
+ Zone: There are supposed to be 7 zones, from 1-7
+ Bonus: Min value should be 1, since it is calculated by number of years since last claim + 1
+ Make: There are 9 categories for Make
+ Insured- Number of insured policy years. Seems to be positively Skewed.
+ Claims- Seems to be positively Skewed.
+ Payments: Seems to be positively Skewed.
+
+factorizing necessary columns: Zone, Make
+I might change the Km to a factor later since the values represent a range of distances traveled. I'll leave it as it is for now.
+
+```{r}
+df_processed_insurance <- df_insurance %>%
+  mutate(
+    Zone=as.factor(Zone),
+    Make=as.factor(Make)
+  )
+str(df_processed_insurance)
+```
+Handling Outliers:
+Insured, Claims, Payments
+
+Viewing Distributions:
+```{r}
+
+q1 <- quantile(df_processed_insurance$Insured, 0.25)
+median <- median(df_processed_insurance$Insured)
+q3 <- quantile(df_processed_insurance$Insured, 0.75)
+
+
+ggplot(df_processed_insurance) +
+  geom_boxplot(aes(x = "", y = Insured)) +
+  labs(title = "Box Plot of Insured",x=" Insurance Values") +
+  scale_y_continuous(limits = c(0, 1500))+
+geom_text(aes(x = 1, y = q1, label = paste("Q1:", q1)),
+            vjust = -0.5, hjust = 0.5, color = "blue") +
+  geom_text(aes(x = 1, y = median, label = paste("Median:", median)),
+            vjust = -0.5, hjust = 1.5, color = "red") +
+  geom_text(aes(x = 1, y = q3, label = paste("Q3:", q3)),
+            vjust = 2.5, hjust = 0.5, color = "blue")
+
+```
+Viewing insured by Make
+
+```{r}
+make_vs_insured <- ggplot(df_processed_insurance)+
+  geom_boxplot(aes(x=Make,y=Insured),fill="orange")
+
+make_vs_insured
+```
+
+It seems like the extreme values are coming mostly from the ninth make, which is the Others Category
+
+
+
+
+
+
+```{r}
+ggplot(df_processed_insurance) +
+  geom_histogram(aes(x = Claims), binwidth = 30, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Claims")
+```
+There seems to numerous claim counts past the interquartile range of 1-21, indicating significant variability and dispersion. These outliers seem valid and could possibly lead to insights, so I will keep them as it is without applying log transformations.
+
+```{r}
+make_vs_claims <- ggplot(df_processed_insurance) +
+  geom_boxplot(aes(x = Make, y=Claims),fill="yellow") +
+  labs(title = "Number of Claims per Make", y="Count of Claims")
+make_vs_claims
+```
+It seems like the larger values for claims come from the "Others" section, aka Make 9. For the most part, claims are well below 500 for the other Makes.
+
+
+
+```{r}
+make_vs_payment <- ggplot(df_processed_insurance) +
+  geom_boxplot(aes(x = Make, y=Payment,fill="red")) +
+  labs(title = "Payments made for each Make", y="Swedish Krona Currency")
+make_vs_payment
+```
+It makes sense why Make 9 has such a wide dispersion, since it represents the "Other" category. The dispersion and variability is fairly low for categories 2-8.
+
+
+
+As we can see, most of the variability and extreme values comes from the "Others" Make category, Category 9
+```{r}
+# plotting Make against bonus as well
+
+make_vs_bonus <- ggplot(df_processed_insurance) +
+  geom_boxplot(aes(x = Make, y=Bonus,fill="pink")) +
+  labs(title = "Make vs Bonus", y="Bonus")
+
+(make_vs_claims + make_vs_payment) /(make_vs_insured + make_vs_bonus)
+
+```
+It seems like Category 9 does not have any strange outliers when it comes to the Bonus section, strangely.
+
+### Distributions of Distance Traveled, Origin, and Make
+
+
+
+
+
+```{r}
+bar_make <- ggplot(df_processed_insurance)+
+  geom_bar(aes(x=Make,fill=Make)) +
+  labs(title="Number of each Make")
+
+ make_by_zone <- ggplot(df_processed_insurance, aes(x = Make, fill = as.factor(Zone))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Make By Zone") +
+  theme_minimal()
+
+make_vs_km <- ggplot(df_processed_insurance, aes(x = Make, y = Kilometres,fill=Make)) +
+  geom_boxplot() +
+  labs(title = "Make vs Kilometers Traveled") +
+  theme_minimal()
+
+bar_make +  make_by_zone /make_vs_km
+```
+
+The dataset seems to have a roughly equal number of each Make. This is interesting since the Ninth make, Others, is responsible for a disproportionally large amount of variance and outliers. Make 9 seems to have the same dispersion in Kilometers as well as zone  as compared to the other Makes, which is strange since it has such high variability and outliers in terms of Claims, Payments, and Insured.
+
+
+### Looking into Group 9 specifically
+
+
 
