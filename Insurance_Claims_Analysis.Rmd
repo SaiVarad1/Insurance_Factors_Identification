@@ -24,7 +24,7 @@ df_insurance <- read_csv("Insurance_factor_identification.csv")
 ```{r}
 str(df_insurance)
 ```
-
+## Analysis Task 1: The committee is interested to know each field of the data collected through descriptive analysis to gain basic insights into the data set and to prepare for further analysis. 
 
 ```{r}
 summary(df_insurance)
@@ -164,6 +164,20 @@ The dataset seems to have a roughly equal number of each Make. This is interesti
 
 
 ### Looking into Group 9 specifically
+
+```{r}
+
+
+summary_for_make9 <- df_processed_insurance %>%
+  group_by(Make) %>%
+  summarise_all(list(mean = mean, median = median, max = max, min = min))
+
+summary_make9 <- summary_for_make9 %>%
+  filter(Make == 9)
+
+```
+
+## Analysis Task 2: The total value of payment by an insurance company is an important factor to be monitored. So the committee has decided to find whether this payment is related to the number of claims and the number of insured policy years. They also want to visualize the results for better understanding. 
 
 
 
