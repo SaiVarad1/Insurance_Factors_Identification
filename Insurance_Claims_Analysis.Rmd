@@ -163,21 +163,64 @@ bar_make +  make_by_zone /make_vs_km
 The dataset seems to have a roughly equal number of each Make. This is interesting since the Ninth make, Others, is responsible for a disproportionally large amount of variance and outliers. Make 9 seems to have the same dispersion in Kilometers as well as zone  as compared to the other Makes, which is strange since it has such high variability and outliers in terms of Claims, Payments, and Insured.
 
 
-### Looking into Group 9 specifically
+Using hypotheseis testing to check if the observed differences between Makes 1-8 and 9 are due to chance or are statistically significant:
+
+Insured Variable:
+
+Null Hypothesis, H0- There is so significant difference between Insured status between Make 9 and the other makes
+Alternative Hypothesis H1- There is a signficant difference between Insured status between the two groups.
+Significance level: 0.05
 
 ```{r}
+make9_data <- df_processed_insurance %>%
+filter(Make == 9)
 
+other_makes_data <- df_processed_insurance %>%
+  filter(Make != 9)
 
-summary_for_make9 <- df_processed_insurance %>%
-  group_by(Make) %>%
-  summarise_all(list(mean = mean, median = median, max = max, min = min))
+# Perform independent samples t-test
+ttest_result <- t.test(make9_data$Insured, other_makes_data$Insured)
 
-summary_make9 <- summary_for_make9 %>%
-  filter(Make == 9)
+# Print the t-test result
+print(ttest_result)
 
 ```
+```{r}
+str(colnames(df_processed_insurance))
+
+for (col in colnames(df_processed_insurance)) {
+  print(col)
+}
+```
+
+
+```{r}
+make9_data <- df_insurance %>% # using original dataset because every column in original is numeric
+filter(Make == 9)
+
+other_makes_data <- df_insurance %>%
+  filter(Make != 9)
+
+# Perform independent samples t-test
+for (col in colnames(df_insurance)) {
+  cat("Checking column:", col, "\n")
+  ttest_result <- t.test(make9_data[[col]], other_makes_data[[col]])
+  # Print the t-test result
+  print(ttest_result)
+}
+
+
+
+
+```
+It seems like Make 9 is statistically significant in terms of Number of Claims, Payment, and Insured but not in terms of Kilometers traveled and Bonuses.
+
+This could indicate that this category has specific characteristics that lead to higher claims, payments, and insured amounts. This might be due to certain features of the vehicles in this category, driving patterns, or other factors unique to "Make 9."
 
 ## Analysis Task 2: The total value of payment by an insurance company is an important factor to be monitored. So the committee has decided to find whether this payment is related to the number of claims and the number of insured policy years. They also want to visualize the results for better understanding. 
 
+My approach:
+
+I was thinking of using regression lines and plotting Payment vs Insured and Claims and checking the regression line. I was also considering doing it separately for models 1-8 and model 9. 
 
 
