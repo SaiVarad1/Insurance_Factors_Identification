@@ -53,7 +53,9 @@ I might change the Km to a factor later since the values represent a range of di
 df_processed_insurance <- df_insurance %>%
   mutate(
     Zone=as.factor(Zone),
-    Make=as.factor(Make)
+    Make=as.factor(Make),
+    Bonus=as.factor(Bonus),
+    Kilometres=as.factor(Kilometres)
   )
 str(df_processed_insurance)
 ```
@@ -273,6 +275,34 @@ summary(multiplelm)
 ```
 We can see that Kilometers, Zome, Insured and Claims are statistically significant while Bonus and Make are not, implying that the former affect Payment while the latter do not.
 
+### Analysis Task 4:
+
+The insurance company is planning to establish a new branch office, so they are interested to find at what location, kilometre, and bonus level their insured amount, claims, and payment gets increased. 
+
+Approach : Group by location, km, bonus level and summarize mean amount, claims, and payment
 
 
+```{r}
+agg_data <- df_processed_insurance %>%
+  group_by(Kilometres, Zone, Bonus) %>%
+  summarise(
+    mean_insured= mean(Insured),
+    mean_claims=mean(Claims),
+    mean_payment=mean(Payment)
+    
+  )
+agg_data
+```
 
+```{r}
+summary(agg_data)
+```
+
+
+```{r}
+ordered_agg_data <- agg_data[order(-agg_data$mean_insured, -agg_data$mean_claims, -agg_data$mean_payment), ]
+ordered_agg_data
+
+```
+
+Based on this table, I'd recommend Zone 4, which has the top 3 highest mean Insured , claims amd payment values.
