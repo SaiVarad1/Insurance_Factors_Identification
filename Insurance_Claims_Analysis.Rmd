@@ -264,4 +264,15 @@ As we can see, Payment is strongly positively correlated, with an R Squared valu
 the committee wants to figure out the reasons for insurance payment increase and decrease. So they have decided to find whether distance, location, bonus, make, and insured amount or claims are affecting the payment or all or some of these are affecting it. 
 
 
+Approach: I'll use multiple linear regression and check each independent variable for statistical significance, i.e. if their p-value is less than 0.05.
+
+
+```{r}
+multiplelm <- lm(Payment ~ .,df_insurance)
+summary(multiplelm)
+```
+We can see that Kilometers, Zome, Insured and Claims are statistically significant while Bonus and Make are not, implying that the former affect Payment while the latter do not.
+
+
+
 
