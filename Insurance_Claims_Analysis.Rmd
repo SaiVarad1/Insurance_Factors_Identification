@@ -306,3 +306,22 @@ ordered_agg_data
 ```
 
 Based on this table, I'd recommend Zone 4, which has the top 3 highest mean Insured , claims amd payment values.
+
+
+### Analysis Task 5:
+
+The committee wants to understand what affects their claim rates so as to decide the right premiums for a certain set of situations. Hence, they need to find whether the insured amount, zone, kilometre, bonus, or make affects the claim rates and to what extent. 
+
+Approach: I will check the p values for statistical significance and check the coefficients for magnitude of effect.
+
+
+
+```{r}
+lm_claimrates <- lm(Claims ~Insured + Zone + Kilometres + Bonus, df_insurance)
+summary(lm_claimrates)
+```
+
+
+
+We can see that the Insured amount, zone, kilometre, bonus all are statistically significant, meaning that they affect the Claims rate. Zone seems to have the strongest magnitude of effect at -6, followed by Bonus at -4 and Kilometers at -3, and then by Insured at 0.03. 
+
