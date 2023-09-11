@@ -221,6 +221,47 @@ This could indicate that this category has specific characteristics that lead to
 
 My approach:
 
-I was thinking of using regression lines and plotting Payment vs Insured and Claims and checking the regression line. I was also considering doing it separately for models 1-8 and model 9. 
+Using regression lines and plotting Payment vs Insured and Claims and checking the regression line. I was also considering doing it separately for models 1-8 and model 9. 
+
+
+
+Payment vs Insured
+
+```{r}
+ggplot(df_processed_insurance,aes(x=Payment,y=Insured)) +
+  geom_point() +
+  geom_smooth(method="lm")
+```
+R squared value:
+```{r}
+lm_model <- lm(Insured~ Payment, data = df_processed_insurance)
+rsquared <- summary(lm_model)$r.squared
+rsquared
+```
+
+
+Payment vs Claims
+
+
+```{r}
+ggplot(df_processed_insurance,aes(x=Payment,y=Claims)) +
+  geom_point() +
+  geom_smooth(method="lm")
+```
+
+R squared value:
+```{r}
+lm_model <- lm(Claims ~ Payment, df_processed_insurance)
+summary(lm_model)$r.squared
+```
+
+
+As we can see, Payment is strongly positively correlated, with an R Squared value of 0.87 with both Insurance and Claims.
+
+
+
+### Analysis Task 3
+the committee wants to figure out the reasons for insurance payment increase and decrease. So they have decided to find whether distance, location, bonus, make, and insured amount or claims are affecting the payment or all or some of these are affecting it. 
+
 
 
